@@ -7,11 +7,12 @@ from dataclasses import dataclass
 from transformers import AutoModelForCausalLM, AutoTokenizer, get_cosine_schedule_with_warmup
 from tqdm import tqdm
 
-from utils import get_device, get_optimizer, autocast_ctx
+from utils import *
 
 @dataclass
 class TrainConfig:
     model_name: str = "Qwen/Qwen2.5-1.5B-Instruct"
+    project_name: str = "Qwen-alignment"
     device: str = get_device()
     beta: float = 0.1
     max_length: int = 256
@@ -149,8 +150,7 @@ def dpo_train(config: TrainConfig):
     train_iter = iter(train_loader)
     policy_model.train()
 
-    train_log = []
-    val_log = []
+    logger = Logger("Qwen-alignment", True, config)
     best_val_loss = float('inf')
 
     for step in tqdm(range(total_steps)):
@@ -178,28 +178,27 @@ def dpo_train(config: TrainConfig):
         if (step + 1) % config.log_interval == 0:
             current_lr = scheduler.get_last_lr()[0]
             loss_log = loss.item() * config.grad_accum
-            train_log.append((step, loss_log))
-            tqdm.write(f"[{step}|{total_steps}] | loss: {loss_log:.4f} | yw_reward: {yw_reward:.4f} | yl_reward: {yl_reward:.4f} | lr: {current_lr}")
+            logger.log_train(step, loss_log, yw_reward, yl_reward, current_lr)
 
         # eval
         if (step + 1) % config.eval_interval == 0:
             val_loss = evaluate(policy_model, ref_model, val_loader, config)
-            val_log.append((step, val_loss))
+            logger.log_val(step, val_loss)
 
             if val_loss < best_val_loss:
                 best_val_loss = val_loss
                 policy_model.save_pretrained(f"{config.save_dir}/best")
                 tokenizer.save_pretrained(f"{config.save_dir}/best")
-                tqdm.write(f"best model saved | val_loss: {val_loader:.4f}")
 
         # checkpoint
         if (step + 1) % config.save_interval == 0:
             policy_model.save_pretrained(f"{config.save_dir}/step_{step+1}")
             tokenizer.save_pretrained(f"{config.save_dir}/step_{step+1}")
 
-if __name__ == '__main__':
-    import argparse
+    logger.finish()
 
+if __name__ == '__main__':
     torch.set_float32_matmul_precision('high')
 
-    parser = argparse.ArgumentParser()
+    args = get_args()
+    config = TrainConfig(**vars(args))
