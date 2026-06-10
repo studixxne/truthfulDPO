@@ -17,7 +17,7 @@ class TrainConfig:
     beta: float = 0.1
     max_length: int = 256
     epochs: int = 2
-    lr: int = 4e-6
+    lr: float = 4e-6
     weight_decay: float = 0.1
     warmup_ratio: float = 0.1
     batch_size: int = 16
