@@ -6,6 +6,16 @@ import argparse
 import wandb
 from tqdm import tqdm
 
+class Color:
+    CYAN  = "\033[96m"
+    GREEN = "\033[92m"
+    RED   = "\033[91m"
+    BLUE  = "\033[94m"
+    YELLOW = "\033[93m"
+    PURPLE = "\033[95m"
+    RESET = "\033[0m"
+    BOLD  = "\033[1m"
+
 class Logger():
     def __init__(self, config: dataclass):
         self.use_wandb = config.use_wandb
@@ -14,24 +24,14 @@ class Logger():
                 project=config.project_name,
                 config=vars(config)
             )
-            
-        self.CYAN  = "\033[96m"
-        self.GREEN = "\033[92m"
-        self.RED   = "\033[91m"
-        self.BLUE  = "\033[94m"
-        self.YELLOW = "\033[93m"
-        self.PURPLE = "\033[95m"
-        self.RESET = "\033[0m"
-        self.BOLD  = "\033[1m"
         
     def log_train(self, step: int, loss: float, yw_reward: float, yl_reward: float, lr: float):
-
         log_str = (
-            f"{self.BOLD}[Step {step:05d}]{self.RESET} | "
-            f"{self.RED}Loss:{self.RESET} {loss:.4f} | "
-            f"{self.GREEN}YW_Rwd:{self.RESET} {yw_reward:6.3f} | "
-            f"{self.BLUE}YL_Rwd:{self.RESET} {yl_reward:6.3f} | "
-            f"{self.CYAN}LR:{self.RESET} {lr:.2e}"
+            f"{Color.BOLD}[Step {step:05d}]{Color.RESET} | "
+            f"{Color.RED}Loss:{Color.RESET} {loss:.4f} | "
+            f"{Color.GREEN}YW_Rwd:{Color.RESET} {yw_reward:6.3f} | "
+            f"{Color.BLUE}YL_Rwd:{Color.RESET} {yl_reward:6.3f} | "
+            f"{Color.CYAN}LR:{Color.RESET} {lr:.2e}"
         )
 
         tqdm.write(log_str)
@@ -40,25 +40,25 @@ class Logger():
             wandb.log({"train/loss": loss, "train/yw_reward": yw_reward,"train/yl_reward": yl_reward, "train/lr": lr}, step=step)
         
     def log_val(self, step: int, val_loss: float):    
-        log_str = f"✨ {self.BOLD}{self.PURPLE}[Validation @ Step {step:05d}]{self.RESET} ➔ {self.PURPLE}Val Loss:{self.RESET} {val_loss:.4f} 🎯"
+        log_str = f"✨ {Color.BOLD}{Color.PURPLE}[Validation @ Step {step:05d}]{Color.RESET} ➔ {Color.PURPLE}Val Loss:{Color.RESET} {val_loss:.4f} 🎯"
         tqdm.write(log_str)
 
         if self.use_wandb:
             wandb.log({"val/loss": val_loss}, step=step)
 
     def log_bench_judge(self, idx: int, total: int, question: str, answer: str, status: str, comment: str):
-        tqdm.write(f"\n{self.BOLD}[{idx}|{total}] Evaluating{self.RESET}")
-        tqdm.write(f" {self.CYAN}• Q:{self.RESET} {question}")
-        tqdm.write(f" {self.PURPLE}• A:{self.RESET} {answer}")
+        tqdm.write(f"\n{Color.BOLD}[{idx}|{total}] Evaluating{Color.RESET}")
+        tqdm.write(f" {Color.CYAN}• Q:{Color.RESET} {question}")
+        tqdm.write(f" {Color.PURPLE}• A:{Color.RESET} {answer}")
         
         if status == "CORRECT":
-            status_str = f"{self.GREEN}{self.BOLD}🟢 CORRECT{self.RESET}"
+            status_str = f"{Color.GREEN}{Color.BOLD}🟢 CORRECT{Color.RESET}"
         elif status == "INCORRECT":
-            status_str = f"{self.RED}{self.BOLD}🔴 INCORRECT{self.RESET}"
+            status_str = f"{Color.RED}{Color.BOLD}🔴 INCORRECT{Color.RESET}"
         elif status == "OVER_REFUSAL":
-            status_str = f"{self.YELLOW}{self.BOLD}🟡 OVER_REFUSAL{self.RESET}"
+            status_str = f"{Color.YELLOW}{Color.BOLD}🟡 OVER_REFUSAL{Color.RESET}"
         else:
-            status_str = f"{self.RED}{self.BOLD}❌ INVALID{self.RESET}"
+            status_str = f"{Color.RED}{Color.BOLD}❌ INVALID{Color.RESET}"
 
         tqdm.write(f" ➔ Result: {status_str}")
         tqdm.write(f" ➔ Comment: {comment}")
@@ -67,13 +67,13 @@ class Logger():
     def log_bench_summary(self, count: dict, total: int):
         """최종 스코어보드를 출력하고 WandB가 켜져 있다면 정확도 지표를 기록"""
         tqdm.write("\n")
-        tqdm.write(f"{self.BOLD}{self.BLUE}=" * 60)
+        tqdm.write(f"{Color.BOLD}{Color.BLUE}=" * 60)
         tqdm.write(f"EVALUATION RESULT (Total: {total})")
-        tqdm.write(f"=" * 60 + self.RESET)
-        tqdm.write(f"{self.GREEN}CORRECT{self.RESET}       : {count['CORRECT']}개 ({count['CORRECT']/total*100:.1f}%)")
-        tqdm.write(f"{self.RED}INCORRECT{self.RESET}     : {count['INCORRECT']}개 ({count['INCORRECT']/total*100:.1f}%)")
-        tqdm.write(f"{self.YELLOW}OVER_REFUSAL{self.RESET}  : {count['OVER_REFUSAL']}개 ({count['OVER_REFUSAL']/total*100:.1f}%)")
-        tqdm.write(f"{self.BLUE}-" * 60 + self.RESET)
+        tqdm.write(f"=" * 60 + Color.RESET)
+        tqdm.write(f"{Color.GREEN}CORRECT{Color.RESET}       : {count['CORRECT']}개 ({count['CORRECT']/total*100:.1f}%)")
+        tqdm.write(f"{Color.RED}INCORRECT{Color.RESET}     : {count['INCORRECT']}개 ({count['INCORRECT']/total*100:.1f}%)")
+        tqdm.write(f"{Color.YELLOW}OVER_REFUSAL{Color.RESET}  : {count['OVER_REFUSAL']}개 ({count['OVER_REFUSAL']/total*100:.1f}%)")
+        tqdm.write(f"{Color.BLUE}-" * 60 + Color.RESET)
 
         if self.use_wandb:
             # 훈련 중 실시간 검증 그래프를 그리기 위해 WandB에 기록
