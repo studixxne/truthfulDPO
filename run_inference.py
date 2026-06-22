@@ -4,6 +4,7 @@ from datasets import load_dataset
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 import json
+from peft import PeftModel
 from utils import *
 
 @dataclass
@@ -16,10 +17,18 @@ class InferenceConfig:
     do_sample: bool = True
     input_file: str = "./data/generated/synthetic_prompts.json"
     output_file: str = "./data/generated/qwen_responses.json"
+    lora_path: str = None
 
 def main():
     args = get_args(InferenceConfig)
     config = InferenceConfig(**vars(args))
+
+    tokenizer = AutoTokenizer.from_pretrained(config.model_name)
+    model = AutoModelForCausalLM.from_pretrained(config.model_name, dtype=torch.float16).to(config.device)
+
+    if not config.lora_path == None:
+        model = PeftModel.from_pretrained(model, config.lora_path)
+        print("LoRA 적용 완료")
 
     dataset = None
 
@@ -40,7 +49,7 @@ def main():
         raise ValueError("Mode Error!")
     
     prompts = [item["question"] for item in dataset]
-    results = inference(config, prompts)
+    results = inference(model, tokenizer, config, prompts)
 
     final_outputs = []
 
@@ -66,9 +75,7 @@ def main():
     with open(config.output_file, 'w', encoding='utf-8') as f:
         json.dump(final_outputs, f, ensure_ascii=False, indent=2)
 
-def inference(config: InferenceConfig, prompts: list[str]) -> list[list[str]]:
-    tokenizer = AutoTokenizer.from_pretrained(config.model_name)
-    model = AutoModelForCausalLM.from_pretrained(config.model_name, dtype=torch.float16).to(config.device)
+def inference(model: torch.Tensor, tokenizer: AutoTokenizer, config: InferenceConfig, prompts: list[str]) -> list[list[str]]:
     logger = Logger(config)
 
     result = []
