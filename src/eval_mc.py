@@ -7,7 +7,7 @@ from tqdm import tqdm
 import numpy as np
 from dataclasses import dataclass
 
-from utils import get_device, Logger, get_args
+from src.utils import get_device, Logger, get_args
 
 @dataclass
 class EvalConfig:

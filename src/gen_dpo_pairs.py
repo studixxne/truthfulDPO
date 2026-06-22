@@ -9,7 +9,7 @@ from pydantic import BaseModel
 from dataclasses import dataclass
 from tqdm import tqdm
 
-from utils import get_args, Color
+from src.utils import get_args, Color
 
 load_dotenv()
 

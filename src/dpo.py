@@ -11,7 +11,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, get_cosine_schedul
 from peft import get_peft_model, LoraConfig, TaskType
 from tqdm import tqdm
 
-from utils import *
+from src.utils import *
 
 @dataclass
 class TrainConfig:
