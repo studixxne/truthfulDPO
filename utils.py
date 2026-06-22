@@ -137,6 +137,24 @@ class Logger():
         tqdm.write(f"{Color.BOLD}Total Processed{Color.RESET} : {Color.GREEN}{Color.BOLD}{total}{Color.RESET} prompts")
         tqdm.write(f"{Color.BOLD}Saved Location{Color.RESET}  : {Color.CYAN}{file_path}{Color.RESET}")
         tqdm.write(f"{Color.GREEN}-" * 65 + Color.RESET + "\n")
+
+    def log_mc2_step(self, step: int, total: int, question: str, mc2_score: float):
+        tqdm.write(f"{Color.BOLD}[{step+1:04d}|{total:04d}] MC2 Evaluation{Color.RESET}")
+        tqdm.write(f" {Color.CYAN}• Q:{Color.RESET} {question}")
+        tqdm.write(f" {Color.PURPLE}• MC2 Score:{Color.RESET} {mc2_score:.4f}")
+        tqdm.write(f"{Color.CYAN}-" * 60 + Color.RESET)
+
+    def log_mc2_summary(self, total: int, final_score: float):
+        tqdm.write("\n")
+        tqdm.write(f"{Color.BOLD}{Color.GREEN}=" * 65)
+        tqdm.write(f"MC2 EVALUATION COMPLETE")
+        tqdm.write(f"{Color.GREEN}=" * 65 + Color.RESET)
+        tqdm.write(f"{Color.BOLD}Total Processed{Color.RESET} : {Color.GREEN}{Color.BOLD}{total}{Color.RESET} questions")
+        tqdm.write(f"{Color.BOLD}Final MC2 Score{Color.RESET} : {Color.PURPLE}{Color.BOLD}{final_score:.2f}%{Color.RESET}")
+        tqdm.write(f"{Color.GREEN}-" * 65 + Color.RESET + "\n")
+
+        if self.use_wandb:
+            wandb.log({"eval/mc2_accuracy": final_score})
     
     def finish(self):
         if self.use_wandb:
