@@ -11,7 +11,7 @@ from src.utils import get_device, Logger, get_args
 
 @dataclass
 class EvalConfig:
-    device = get_device()
+    device: str = get_device()
     model_name: str = "Qwen/Qwen2.5-1.5B-Instruct"
     peft_model_path: str = None
     use_wandb: bool = False
