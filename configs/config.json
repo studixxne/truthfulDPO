@@ -1,0 +1,51 @@
+{
+  "gen_prompts": {
+    "project_name": "Qwen-alignment",
+    "judge_model": "gemini-2.5-flash",
+    "output_file": "./data/01_synthetic_prompts.json",
+    "total_generate": 1500,
+    "batch_size": 20
+  },
+
+  "run_inference": {
+    "model_name": "Qwen/Qwen2.5-1.5B-Instruct",
+    "temperature": 0.9,
+    "num_generations": 2,
+    "do_sample": true,
+    "input_file": "./data/01_synthetic_prompts.json",
+    "output_file": "./data/02_model_responses.json"
+  },
+
+  "gen_dpo_pairs": {
+    "judge_model": "gemini-2.5-flash",
+    "input_file": "./data/02_model_responses.json",
+    "output_file": "./data/03_dpo_pairs.json"
+  },
+
+  "dpo": {
+    "project_name": "Qwen-alignment",
+    "use_wandb": true,
+    "model_name": "Qwen/Qwen2.5-1.5B-Instruct",
+    "input_file": "./data/03_dpo_pairs.json",
+    "output_dir": "./models/best_model",
+    "beta": 0.1,
+    "max_length": 1024,
+    "epochs": 2,
+    "lr": 3e-6,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.05,
+    "batch_size": 4,
+    "grad_accum": 8,
+    "log_interval": 1,
+    "eval_interval": 10,
+    "max_grad_norm": 1.0,
+    "save_interval": 100
+  },
+
+  "eval_mc": {
+    "project_name": "Qwen-alignment",
+    "use_wandb": true,
+    "model_name": "Qwen/Qwen2.5-1.5B-Instruct",
+    "peft_model_path": "./models/best_model"
+  }
+}
