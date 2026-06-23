@@ -19,7 +19,7 @@ class TrainConfig:
     project_name: str = "Qwen-alignment"
     device: str = get_device()
     beta: float = 0.1
-    max_length: int = 256
+    max_length: int = 2048
     epochs: int = 2
     lr: float = 3e-6
     weight_decay: float = 0.01
