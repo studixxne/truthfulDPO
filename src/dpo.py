@@ -252,8 +252,12 @@ def dpo_train(config: TrainConfig):
 
         # checkpoint
         if (step + 1) % config.save_interval == 0:
-            model.save_pretrained(f"{config.output_dir}/step_{step+1}")
-            tokenizer.save_pretrained(f"{config.output_dir}/step_{step+1}")
+            model.save_pretrained(f"{config.output_dir}")
+            tokenizer.save_pretrained(f"{config.output_dir}")
+
+    # 최종 저장
+    model.save_pretrained(f"{config.output_dir}")
+    tokenizer.save_pretrained(f"{config.output_dir}")
 
     logger.finish()
 
