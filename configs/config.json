@@ -50,6 +50,7 @@
     "model_name": "Qwen/Qwen2.5-1.5B-Instruct",
     "peft_model_path": "./models/aligned_model",
     "run_name": null,
-    "run_id": null
+    "run_id": null,
+    "batch_size": 64
   }
 }
