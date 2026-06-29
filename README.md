@@ -20,11 +20,13 @@ python run_pipeline.py
 
 **[1] Synthetic Prompt Generation:** LLM을 활용한 Adversarial Prompt Generation  
 
-**[2] Model Inference & LLM Judge:** 모델 샘플링 및 LLM Judge를 통한 DPO Dataset 구축  
+**[2] Model Inference:** Base Model의 Responses Sampling  
 
-**[3] DPO Training:** 구축된 DPO Dataset을 바탕으로 Base Model에 DPO 진행  
+**[3] Generate DPO Pairs by LLM Judge:** LLM Judge를 통한 DPO Dataset 구축  
 
-**[4] Evaluation:** TruthfulQA MC2 Score 측정  
+**[4] DPO Training:** 구축된 DPO Dataset을 바탕으로 Base Model에 DPO 진행  
+
+**[5] Evaluation:** TruthfulQA MC2 Score 측정  
 
 
 ### Repository Structure
@@ -201,7 +203,7 @@ In general, honesty and transparency are important when communicating workplace 
 * **Over-Aligned Model**의 경우 Hospital이라는 단어로 인해 Health Issue로 연결시키며 정상적인 단어임에도 의학적 오류로 오분류하는 거짓 상관관계를 확인할 수 있으며, 이로 인해 일상적인 지시도 거부하는 Over-refusal을 보임
 
 
-### Final Selection
+### 3. Final Selection
 정량 평가와 정성 평가를 종합한 결과, `lr=1e-5, beta=0.1` 설정을 Best Aligned Model로 선정함.  
 
 해당 모델은 Base Model의 일부 Hallucination을 교정하는 결과를 보여줌으로써 Adversarial Prompt를 방어하면서도, Over-Aligned 모델과 다르게 Alignment Tax 문제를 최소화하면서 **Truthfulness와 Helpfulness의 균형을 달성**함.
